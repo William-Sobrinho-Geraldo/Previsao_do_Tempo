@@ -8,10 +8,10 @@ import GraficoLinha from './src/componentes/gráfico';
 
 const App: React.FC = () => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-  const [temperaturasMax, setTemperaturasMax] = useState<number[]>([]);
+  const [temperaturasMax, setTemperaturasMax] = useState<number[]>([15]);
 
   const xValues = [1,2,3,4,5,6,7,8,9,10];
-  const temperaturaData = xValues.map((x,index) => ({
+  let temperaturaData = xValues.map((x,index) => ({
     x,
     y: temperaturasMax[index],
   }));
@@ -33,6 +33,7 @@ const App: React.FC = () => {
     );
   }, []);
   
+
   const getWeatherData = async (latitude: number, longitude: number) => {
     try {
       const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${API_KEY}`;
@@ -40,14 +41,19 @@ const App: React.FC = () => {
       const response = await axios.get(url);
       setWeatherData(response.data);
       const valoresTempMax = weatherData?.list.slice(0,10).map(item => Math.round(item.main.temp_max - 273.15))
-      if(valoresTempMax !== undefined) {
-        setTemperaturasMax(valoresTempMax)
-      } else { setTemperaturasMax([]) }
+
+        console.log("a variável valoresTempMax recebida foi: " + valoresTempMax)
+        if(valoresTempMax === undefined){
+          console.log("As temperaturasMáx devolvidas pela API foram do tipo  UNDEFINED")
+        } else { setTemperaturasMax(valoresTempMax) }
+        
+      
       
     } catch (error) {
       console.log("O erro na requisição axios foi:  " + error);
     }
   };
+
 
   if (!weatherData) {
     return (
@@ -57,6 +63,7 @@ const App: React.FC = () => {
     );
   }
 
+  
   return (
     <View style={styles.container}>
       <Text style={styles.city}>{weatherData.city.name}</Text>
